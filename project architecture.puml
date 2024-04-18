@@ -1,0 +1,28 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+[NGINX]
+[UGC]
+
+package "RecSys" {
+  node "AirFlow"{
+    [Prompt generator]
+    [Request manager] --> [Parser]
+  }
+  [NGINX] --> [RecAPI]
+  [Prompt generator] --> [RabbitMQ]
+  [RabbitMQ] <-- [Request manager]
+  [Parser]
+  database RecDB
+}
+
+cloud {
+    [GigaChat]
+}
+
+[RecAPI] --> [RecDB]
+[Request manager] --> [GigaChat]
+[Parser] --> [RecDB]
+[RecAPI] --> [GigaChat]
+[UGC] <-- [Prompt generator]
+@enduml
