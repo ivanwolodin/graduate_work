@@ -16,6 +16,7 @@ class Transformer:
             yield BaseContent(
                 user_id=user_id,
                 content_type=content_type,
+                object_id=content_data.get("object_id"),
                 metrics=content_data.get("metrics"),
             )
 

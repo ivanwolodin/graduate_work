@@ -14,14 +14,14 @@ class ClickHouseLoader:
         self.client.execute(f"CREATE DATABASE IF NOT EXISTS {config.DB_NAME} ON CLUSTER company_cluster")
         self.client.execute(
             f"""CREATE TABLE IF NOT EXISTS {config.DB_NAME}.{table_name} ON CLUSTER company_cluster \
-            (user_id VARCHAR, content_type VARCHAR, metrics INTEGER) ENGINE = MergeTree() \
+            (user_id VARCHAR, content_type VARCHAR, object_id VARCHAR, metrics INTEGER, update_date DateTime DEFAULT now()) ENGINE = MergeTree() \
             ORDER BY (user_id, content_type)"""
         )
 
     @backoff.on_exception(backoff.expo, Exception, max_tries=config.BACKOFF_MAX_TRIES)
     def load(self, table_name: str, data: list[BaseContent]) -> int | None:
-        query = f"""INSERT INTO {config.DB_NAME}.{table_name} (user_id, content_type, metrics) VALUES"""
-        query_params = ((row.user_id, row.content_type, row.metrics) for row in data)
+        query = f"""INSERT INTO {config.DB_NAME}.{table_name} (user_id, content_type, object_id, metrics) VALUES"""
+        query_params = ((row.user_id, row.content_type, row.object_id, row.metrics) for row in data)
         return self.client.execute(query, query_params)
 
 

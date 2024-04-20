@@ -6,6 +6,7 @@ class BaseContent(BaseModel):
 
     user_id: str
     content_type: str
+    object_id: str
     metrics: int
 
     class Config:
