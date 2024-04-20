@@ -58,6 +58,8 @@ services:
       - async_api_service
       - redis_async_api
       - etl
+    ports:
+      - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -72,3 +74,117 @@ services:
         condition: service_healthy
       redis_async_api:
         condition: service_healthy
+
+  ugc-api:
+    container_name: ugc-api
+    restart: always
+    build: ./ugc_service/ugc
+    depends_on:
+      - kafka
+    ports:
+      - "8000:8000"
+
+  ugc-etl:
+    container_name: ugc-etl
+    restart: always
+    build: ./ugc_service/etl
+    depends_on:
+      - ugc-api
+
+  ugc-nginx:
+    image: nginx
+    container_name: nginx-ugc
+    depends_on:
+      - ugc-api
+    volumes:
+      - ./ugc_service/nginx/conf.d:/etc/nginx/conf.d
+      - ./ugc_service/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+
+  zookeeper:
+    image: zookeeper:3.8
+    container_name: zookeeper
+    hostname: zookeeper
+
+  clickhouse-node1:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node1
+    hostname: clickhouse-node1
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./ugc_service/clickhouse/data/node1:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
+
+  clickhouse-node2:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node2
+    hostname: clickhouse-node2
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    volumes:
+      - ./ugc_service/clickhouse/data/node2:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
+
+  clickhouse-node3:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node3
+    hostname: clickhouse-node3
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    volumes:
+      - ./ugc_service/clickhouse/data/node3:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
+
+  clickhouse-node4:
+    image: clickhouse/clickhouse-server:23
+    container_name: clickhouse-node4
+    hostname: clickhouse-node4
+    ports:
+      - "8126:8123"
+      - "9003:9000"
+    volumes:
+      - ./ugc_service/clickhouse/data/node4:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    expose:
+      - "9099"
+    ports:
+      - "9099:9099"
+      - "29099:29099"
+      - "39099:39099"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29099,PLAINTEXT_HOST://kafka:9099,EXTERNAL://127.0.0.1:39099
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --list --bootstrap-server localhost:9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.0
+    ports:
+      - "8088:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:29099
+      - KAFKA_CLUSTERS_0_NAME=kraft
+
+volumes:
+  kafka_data:
