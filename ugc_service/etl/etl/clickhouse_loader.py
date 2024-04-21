@@ -24,6 +24,18 @@ class ClickHouseLoader:
         query_params = ((row.user_id, row.content_type, row.object_id, row.metrics) for row in data)
         return self.client.execute(query, query_params)
 
+    @backoff.on_exception(backoff.expo, Exception, max_tries=config.BACKOFF_MAX_TRIES)
+    def create_recsys_task(self, table_name: str, data: list[BaseContent]) -> list:
+        likes = []
+        for row in data:
+            query = f"""
+                select user_id, content_type, object_id, metrics 
+                from {config.DB_NAME}.{table_name} 
+                where user_id='{row.user_id}' and content_type='0'"""
+            likes.append({row.user_id: self.client.execute(query)})
+        return likes
+
+
 
 @backoff.on_exception(backoff.expo, Exception, max_tries=config.BACKOFF_MAX_TRIES)
 def get_clickhouse_loader():

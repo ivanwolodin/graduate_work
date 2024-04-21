@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 class Config(BaseSettings):
     BACKOFF_MAX_TRIES: int = Field(100, env="BACKOFF_MAX_TRIES")
     KAFKA_TOPIC_NAME: str = Field("ugc", env="KAFKA_TOPIC_NAME")
+    KAFKA_TOPIC_RECSYS: str = Field("recsys", env="KAFKA_TOPIC_RECSYS")
     KAFKA_DSN: str = Field("kafka:29099", env="KAFKA_DSN")
     CLICK_HOST: str = Field("clickhouse-node1", env="CLICK_HOST")
     CLICK_PORT: str = Field("9000", env="CLICK_PORT")
