@@ -29,12 +29,11 @@ class ClickHouseLoader:
         likes = []
         for row in data:
             query = f"""
-                select user_id, content_type, object_id, metrics 
-                from {config.DB_NAME}.{table_name} 
+                select user_id, content_type, object_id, metrics
+                from {config.DB_NAME}.{table_name}
                 where user_id='{row.user_id}' and content_type='0'"""
             likes.append({row.user_id: self.client.execute(query)})
         return likes
-
 
 
 @backoff.on_exception(backoff.expo, Exception, max_tries=config.BACKOFF_MAX_TRIES)
