@@ -6,7 +6,7 @@ services:
     container_name: postgres
     build: ./etc/database/
     env_file:
-      - .env
+      - .env.example
 
 #  nginx:
 #    image: nginx:latest
@@ -17,14 +17,14 @@ services:
 #    depends_on:
 #      - api
 
+
   recsys_api:
-    build:
-      context: ./src
-      dockerfile: Dockerfile
+    build: ./src
+#    restart: always
     ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
+      - "8080:8080"
+#    depends_on:
+#      - postgres
     env_file:
-      - .env
+      - .env.example
 
