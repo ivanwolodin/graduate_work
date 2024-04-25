@@ -4,6 +4,7 @@ from functools import lru_cache
 from typing import Optional, Any
 
 from pydantic import BaseModel, PostgresDsn, field_validator
+from pydantic_core.core_schema import ValidationInfo
 from pydantic_settings import BaseSettings
 from utils.logging import StandardFormatter, ColorFormatter
 
@@ -30,12 +31,12 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = os.getenv("POSTGRES_DB")
     # set the default value to None, such that the assemble_db_connection can
     # build the URI for us and do checks.
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
+    SQLALCHEMY_DATABASE_URI: Optional[str] = None
 
     # noinspection PyMethodParameters
     @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
     def assemble_db_connection(
-            cls, v: Optional[str], values: dict[str, Any]) -> str:
+            cls, v: Optional[str], values: ValidationInfo) -> str:
         """Assemble the postgres DB URI with the provided POSTGRES_SERVER,
         POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB.
 
@@ -50,11 +51,11 @@ class Settings(BaseSettings):
             return v
         return PostgresDsn.build(
             scheme="postgresql",
-            username=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
-        )
+            username=values.data.get("POSTGRES_USER"),
+            password=values.data.get("POSTGRES_PASSWORD"),
+            host=values.data.get("POSTGRES_SERVER"),
+            path=f"/{values.data.get('POSTGRES_DB') or ''}",
+        ).unicode_string()
 
     LOGGING_CONFIG: LoggingConfig = {
         "version": 1,

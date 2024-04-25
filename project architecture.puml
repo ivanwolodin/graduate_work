@@ -5,14 +5,11 @@
 [UGC]
 
 package "RecSys" {
-  node "AirFlow"{
-    [Prompt generator]
-    [Request manager] --> [Parser]
-  }
+  [Prompt generator]
   [NGINX] --> [RecAPI]
   [Prompt generator] --> [RabbitMQ]
-  [RabbitMQ] <-- [Request manager]
-  [Parser]
+  [RabbitMQ] <--> [Request manager]
+  [Parser] --> [RabbitMQ]
   database RecDB
 }
 
@@ -25,4 +22,6 @@ cloud {
 [Parser] --> [RecDB]
 [RecAPI] --> [GigaChat]
 [UGC] <-- [Prompt generator]
+[AsyncAPI] <-- [Prompt generator]
+
 @enduml

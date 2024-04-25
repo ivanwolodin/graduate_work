@@ -1,46 +1,30 @@
 version: '3.7'
 
 services:
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    build: ./etc/database/
+    env_file:
+      - .env
 
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - api
+#  nginx:
+#    image: nginx:latest
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - ./nginx.conf:/etc/nginx/nginx.conf
+#    depends_on:
+#      - api
 
   recsys_api:
     build:
-      context: .src/recsys_api
+      context: ./src
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     depends_on:
-      - redis
+      - postgres
+    env_file:
+      - .env
 
-  airflow:
-    image: apache/airflow:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=sqlite:////root/airflow/airflow.db
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    volumes:
-      - ./dags:/root/airflow/dags
-      - ./logs:/root/airflow/logs
-    depends_on:
-      - redis
-      - rabbitmq
-
-  rabbitmq:
-    image: rabbitmq:latest
-    ports:
-      - "5672:5672"
-      - "15672:15672"

@@ -4,6 +4,12 @@ from fastapi import FastAPI
 from config import get_settings
 from src.recsys_api.api import api_router
 from version import __version__
+from db import Base, engine
+
+
+def create_db_tables():
+    """Create all tables in database."""
+    Base.metadata.create_all(engine)
 
 
 def create_application() -> FastAPI:
@@ -28,7 +34,7 @@ def create_application() -> FastAPI:
     # application.add_middleware(BaseHTTPMiddleware, dispatch=log_time)
 
     # create tables in db
-    # create_db_tables()
+    create_db_tables()
 
     return application
 

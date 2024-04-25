@@ -1,14 +1,18 @@
-FROM tiangolo/uvicorn-gunicorn:python3.10
+FROM python:3.11
 
-ARG DB_CONNECTION
-ARG MODE
+#ARG DB_CONNECTION
+#ARG MODE
 
-ENV SQLALCHEMY_DATABASE_URI=${DB_CONNECTION}
-ENV MODE=${MODE}
+#ENV SQLALCHEMY_DATABASE_URI=${DB_CONNECTION}
+#ENV MODE=${MODE}
 
-COPY ./requirements.txt .
-RUN pip install -r base.txt
+COPY /recsys_api/requirements.txt .
+RUN pip install -r requirements.txt
 
-COPY ./scripts /app
+#COPY ./scripts /app
 COPY ./recsys_api /app
-WORKDIR /app
+#WORKDIR /app
+
+#CMD nohup python main.py
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
