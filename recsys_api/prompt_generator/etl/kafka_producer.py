@@ -1,9 +1,5 @@
-from typing import Optional
-
-from kafka import KafkaProducer
-from pydantic import BaseModel
-
 from core.config import config
+from kafka import KafkaProducer
 
 
 class Producer:

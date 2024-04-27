@@ -17,8 +17,8 @@ class KafkaExtractor:
     def extract(self) -> Generator[ConsumerRecord, None, None]:
         try:
             yield from self.consumer
-        except Exception as e:
-            logger.error(f"Error: {e}")
+        except Exception as error:
+            logger.error(f"Error: {error}")
 
     def commit(self):
         self.consumer.commit()

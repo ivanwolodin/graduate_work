@@ -1,8 +1,8 @@
 import json
 from typing import Generator
 
-from kafka.consumer.fetcher import ConsumerRecord
 from core.config import config
+from kafka.consumer.fetcher import ConsumerRecord
 
 
 class Transformer:

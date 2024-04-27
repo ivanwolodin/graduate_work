@@ -4,7 +4,6 @@ import logging
 import time
 
 from core.config import config
-
 from etl.data_transform import get_transformer
 from etl.kafka_extractor import get_kafka_extractor
 from etl.kafka_producer import get_kafka_producer
@@ -29,7 +28,7 @@ def main():
                 if len(messages) >= config.ETL_BATCH_MESSAGE_COUNT:
                     kafka_producer.produce(
                         topic=config.KAFKA_TOPIC_RECSYS_PROMPT,
-                        key=datetime.datetime.now().strftime(f'%Y-%m-%d:%H:%M:%S'),
+                        key=datetime.datetime.now().strftime('%Y-%m-%d:%H:%M:%S'),
                         data=json.dumps(messages),
                     )
 

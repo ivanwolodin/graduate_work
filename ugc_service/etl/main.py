@@ -5,7 +5,6 @@ import time
 from random import randrange
 
 from core.config import config
-
 from etl.clickhouse_loader import get_clickhouse_loader
 from etl.data_transform import get_transformer
 from etl.kafka_extractor import get_kafka_extractor
