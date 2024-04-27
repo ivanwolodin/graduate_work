@@ -58,8 +58,6 @@ services:
       - async_api_service
       - redis_async_api
       - etl
-    ports:
-      - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -81,8 +79,6 @@ services:
     build: ./ugc_service/ugc
     depends_on:
       - kafka
-    ports:
-      - "8089:8000"
 
   ugc-etl:
     container_name: ugc-etl
@@ -91,16 +87,12 @@ services:
     depends_on:
       - ugc-api
 
-#  ugc-nginx:
-#    image: nginx
-#    container_name: nginx-ugc
-#    depends_on:
-#      - ugc-api
-#    volumes:
-#      - ./ugc_service/nginx/conf.d:/etc/nginx/conf.d
-#      - ./ugc_service/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-#    ports:
-#      - "8080:80"
+  recsys:
+    container_name: recsys
+    restart: always
+    build: ./recsys_api
+    depends_on:
+      - ugc-etl
 
   zookeeper:
     image: zookeeper:3.8

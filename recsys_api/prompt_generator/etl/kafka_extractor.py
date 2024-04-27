@@ -27,7 +27,7 @@ class KafkaExtractor:
 @backoff.on_exception(backoff.expo, Exception, max_tries=config.BACKOFF_MAX_TRIES)
 def get_kafka_extractor():
     consumer = KafkaConsumer(
-        config.KAFKA_TOPIC_NAME,
+        config.KAFKA_TOPIC_RECSYS,
         bootstrap_servers=[config.KAFKA_DSN],
         auto_offset_reset='earliest',
         group_id='echo-messages-to-stdout',
