@@ -8,27 +8,29 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./etc/database/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+      - ./etc/recsys_database/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
     env_file:
-      - .env
-
-#  nginx:
-#    image: nginx:latest
-#    ports:
-#      - "80:80"
-#    volumes:
-#      - ./nginx.conf:/etc/nginx/nginx.conf
-#    depends_on:
-#      - api
+      - src/recsys_api/.env
 
   recsys_api:
     build:
       context: ./src
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
+      dockerfile: src/recsys_api/Dockerfile
+#    ports:
+#      - "8000:8000"
     depends_on:
       - postgres
     env_file:
-      - .env
+      - src/recsys_api/.env
+
+  recsys_nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./etc/recsys_nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./etc/recsys_nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - recsys_api
+
 
