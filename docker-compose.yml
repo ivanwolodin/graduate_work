@@ -5,6 +5,10 @@ services:
     image: postgres:latest
     container_name: postgres
     build: ./etc/database/
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./etc/database/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
     env_file:
       - .env
 

@@ -1,12 +1,14 @@
-from sqlalchemy import Column, Integer
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy import Column, Integer, JSON
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID
 
-from ..base import  Base
+from ..base import Base
+
+JSONVariant = JSON().with_variant(JSONB(), "postgresql")
 
 
 class Recommendation(Base):
     __tablename__ = "recomendations"
 
-    user_id = Column(Integer, primary_key=True)
-    list_of_recommendations = Column(JSON, unique=True, index=True)
-
+    user_id = Column(UUID, primary_key=True)
+    list_of_recommendations = Column(JSONVariant)

@@ -6,7 +6,7 @@ from typing import Optional, Any
 from pydantic import BaseModel, PostgresDsn, field_validator
 from pydantic_core.core_schema import ValidationInfo
 from pydantic_settings import BaseSettings
-from utils.logging import StandardFormatter, ColorFormatter
+from .utils.logging import StandardFormatter, ColorFormatter
 
 
 class LoggingConfig(BaseModel):
@@ -54,7 +54,7 @@ class Settings(BaseSettings):
             username=values.data.get("POSTGRES_USER"),
             password=values.data.get("POSTGRES_PASSWORD"),
             host=values.data.get("POSTGRES_SERVER"),
-            path=f"/{values.data.get('POSTGRES_DB') or ''}",
+            path=values.data.get('POSTGRES_DB') or '',
         ).unicode_string()
 
     LOGGING_CONFIG: LoggingConfig = {

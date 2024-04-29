@@ -1,7 +1,9 @@
 """Endpoints for getting recommendation information."""
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import NoResultFound
+
 from ..schemas.recomendation import RecommendationResponse
 from ..services.recommendation import RecommendationService, get_rec_service
 
@@ -15,5 +17,8 @@ async def recommendation(
         user_id: UUID,
         rec_service: RecommendationService = Depends(get_rec_service)
 ):
-    res = rec_service.get_recommendations(user_id)
-    return RecommendationResponse(list_of_recommendations=res.list_of_recommendations)
+    try:
+        res = await rec_service.get_recommendations(user_id)
+    except NoResultFound:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return RecommendationResponse(list_of_films=res.list_of_recommendations)

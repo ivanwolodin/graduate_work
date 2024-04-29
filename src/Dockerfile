@@ -14,5 +14,6 @@ COPY ./recsys_api /app
 #WORKDIR /app
 
 #CMD nohup python main.py
-#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
+#CMD python main.py

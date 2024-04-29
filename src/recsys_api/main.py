@@ -1,10 +1,10 @@
 import uvicorn
 import logging.config
 from fastapi import FastAPI
-from config import get_settings
-from src.recsys_api.api import api_router
-from version import __version__
-from db import Base, engine
+from .config import get_settings
+from .api import api_router
+from .version import __version__
+from .db import Base, engine
 
 
 def create_db_tables():
@@ -43,4 +43,4 @@ app = create_application()
 settings = get_settings()
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=False)  # nosec
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=False)
