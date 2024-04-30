@@ -1,36 +1,74 @@
 version: '3.7'
 
 services:
-  postgres:
+  recsys_db:
     image: postgres:latest
-    container_name: postgres
+    container_name: recsys_db
     build: etc/recsys_database/
-    ports:
-      - "5432:5432"
+#    ports:
+#      - "5432:5432"
     volumes:
       - ./etc/recsys_database/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
     env_file:
       - src/recsys_api/.env
 
+  movies_db:
+    image: postgres:latest
+    container_name: movies_db
+    build: etc/movies_database/
+#    ports:
+#      - "5432:5432"
+    volumes:
+      - ./etc/movies_database/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+    env_file:
+      - src/movies_api/.env
+
   recsys_api:
     build:
-      context: ./src
-      dockerfile: src/recsys_api/Dockerfile
+      context: ./src/recsys_api
+      dockerfile: Dockerfile
 #    ports:
 #      - "8000:8000"
     depends_on:
-      - postgres
+      - recsys_db
     env_file:
       - src/recsys_api/.env
 
-  recsys_nginx:
+  movies_api:
+    build:
+      context: ./src/movies_api
+      dockerfile: Dockerfile
+#    ports:
+#      - "8000:8000"
+    depends_on:
+      - movies_db
+    env_file:
+      - src/movies_api/.env
+
+  nginx:
     image: nginx:latest
     ports:
       - "80:80"
     volumes:
-      - ./etc/recsys_nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./etc/recsys_nginx/conf.d:/etc/nginx/conf.d
+      - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - recsys_api
+      - movies_api
 
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"  # AMQP port
+      - "15672:15672"  # Management UI port
+    volumes:
+      - ./etc/rabbitmq_data:/var/lib/rabbitmq
 
+  prompt_generator:
+    build:
+      context: ./src/recsys_prompt_generator
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+    env_file:
+      - src/recsys_prompt_generator/.env
