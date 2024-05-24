@@ -79,7 +79,8 @@ services:
     build: ./ugc_service/ugc
     depends_on:
       - kafka
-
+    ports:
+      - "8089:8000"
   ugc-etl:
     container_name: ugc-etl
     restart: always
