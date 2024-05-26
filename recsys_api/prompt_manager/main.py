@@ -51,7 +51,9 @@ def main():
                             like_prompt,
                             ' пользователю больше 18 лет',
                             ', нужны фильмы на новогоднюю тематику, наименования фильмов выводи на английском языке ')
+                    logger.info(suggestions)
                 messages.append(suggestions)
+                logger.info(messages)
                 if len(messages) >= config.ETL_BATCH_MESSAGE_COUNT:
                     kafka_producer.produce(
                         topic=config.KAFKA_TOPIC_RECSYS_PROMPT,

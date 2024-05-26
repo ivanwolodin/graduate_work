@@ -2,7 +2,7 @@ import re
 from typing import Union
 
 from langchain.schema import HumanMessage, SystemMessage
-from langchain.chat_models.gigachat import GigaChat
+from langchain_community.chat_models.gigachat import GigaChat
 from langchain_core.tools import tool
 import json
 
@@ -13,7 +13,7 @@ FILM_COUNT = 10
 AUTH = "YjRiMWFhMTktZDNlYS00ZDk5LWFmZjQtMTRjMjU2ZmZlNmZkOjczYmQyMjY3LTkxMjktNDIzMS1hZGEzLTc4OWM1NWI5MTI2MQ=="
 
 
-@tool
+# @tool
 def check_film(a: str) -> bool:
     """Проверяет, есть ли фильм с таким названием в АБВГД справочнике"""
     return a[0] not in 'А'
@@ -35,7 +35,7 @@ def check_answer(answer: str, count: int) -> Union[bool, str]:
         return False
 
 
-tools = [check_film]
+# tools = [check_film]
 
 
 giga = GigaChat(credentials=AUTH,
@@ -43,8 +43,8 @@ giga = GigaChat(credentials=AUTH,
                 verify_ssl_certs=False
                 )
 
-llm_with_tools = giga.bind_tools(tools)
-
+llm_with_tools = giga.bind()
+# llm = giga.bind()
 
 def get_suggestion(like_films_prompt: list | str, user_description: str, additional_info: str = '') -> list:
 
